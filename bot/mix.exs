@@ -6,6 +6,7 @@ defmodule Bot.Mixfile do
       app: :bot,
       version: "0.0.1",
       elixir: "~> 1.2",
+      escript: [main_module: Bot],
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps,
@@ -20,6 +21,7 @@ defmodule Bot.Mixfile do
     [
       applications: [
         :logger,
+        :nadia,
         :httpoison,
         :poison
       ]
@@ -36,6 +38,6 @@ defmodule Bot.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:httpoison, "~> 0.8.0"}, {:poison, "~> 1.5.0"}]
+    [{:nadia, git: "https://github.com/zhyu/nadia"}, {:httpoison, "~> 0.8.0"}, {:poison, "~> 1.5.0"}]
   end
 end

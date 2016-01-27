@@ -27,8 +27,10 @@ defmodule Mix.Tasks.Bot.Run do
   end
 
   def run(_) do
-    IO.puts "Starting task..."
-    loop(0)
+    # IO.puts "Starting task..."
+    # loop(0)
+    Mix.Task.run "app.start", []
+    IO.inspect Nadia.get_me
   end
 
 end
