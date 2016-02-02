@@ -22,8 +22,8 @@ defmodule Bot.Mixfile do
       applications: [
         :logger,
         :nadia,
-        :httpoison,
-        :poison
+        :httpoison, :poison,
+        :tzdata
       ]
     ]
   end
@@ -38,6 +38,14 @@ defmodule Bot.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:nadia, git: "https://github.com/zhyu/nadia"}, {:httpoison, "~> 0.8.0"}, {:poison, "~> 1.5.0"}]
+    [{:nadia, git: "https://github.com/zhyu/nadia"},
+     {:httpoison, "~> 0.8.0"},
+     {:poison, "~> 1.5.0"},
+     # tzdata crash at startup in escript
+     # https://github.com/bitwalker/timex/issues/86
+     {:tzdata, "== 0.1.8", override: true},
+     #
+     {:timex, git: "https://github.com/bitwalker/timex"}
+    ]
   end
 end
