@@ -55,27 +55,37 @@ defmodule Bot do
     if Regex.match?(~r/\//, text) do # starts with "/"
       case text do
         "/recent" <> _ ->
-          IO.puts "recent"
+          IO.puts "get recent"
           carousell_uri = "https://carousell.com/ui/iso/api;path=%2Fproducts%2Fsearch%2F;query=%7B%22count%22%3A"<>"1"<>"%2C%22start%22%3A0%2C%22sort%22%3A%22recent%22%2C%22query%22%3A%22gundam%22%7D"
           HTTPoison.start
           case HTTPoison.get(carousell_uri) do
             {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
               %{result: %{products: products}} = Poison.decode!(body, keys: :atoms)
               bot_reply = ""
-              for p <- products do
-                %{title: title, price: price, id: id, time_created: time_created} = p
-                bot_reply = bot_reply <> "[Title]: " <> title <> "\n"
-                bot_reply = bot_reply <> "[Price]: " <> price <> "\n"
-                bot_reply = bot_reply <> "[URL]: https://carousell.com/p/"<> Integer.to_string(id) <> "\n"
-                bot_reply = bot_reply <> "[Time Created]: " <> time_created
-                IO.inspect DateFormat.Parser.parse(time_created, "{ISOz}")
 
-                Nadia.send_message(chat_id, bot_reply)
+              for {p, index} <- Enum.with_index(products) do
+                %{title: title, price: price, id: id, time_created: time_created} = p
+                time_ago =
+                  DateFormat.parse!(time_created, "{ISOz}")
+                  |> Date.diff(Date.now, :timestamp)
+                  |> TimeFormat.format(:humanized)
+                  |> Kernel.<>(" ago")
+                  |> String.replace(" seconds", "sec")
+                  |> String.replace(" minutes", "min")
+                bot_reply =
+                  IO.iodata_to_binary([bot_reply, Integer.to_string(index+1), ":\n",
+                                      "[Title]: ", title, "\n",
+                                      "[Price]: ", price, "\n",
+                                      "[URL]: https://carousell.com/p/", Integer.to_string(id), "\n",
+                                      "[Time Created]: ", time_ago, "\n"])
+                # Nadia.send_message(chat_id, bot_reply)
               end
+                # TODO: Can't seem to get bot_reply scoped
+                IO.inspect Nadia.send_message(chat_id, bot_reply)
             {:ok, %HTTPoison.Response{status_code: 404}} ->
               IO.puts "Not found :("
             {:error, %HTTPoison.Error{reason: reason}} ->
-              IO.inspect reason
+              IO.inspect ["error: ", reason]
           end
         _ ->
           IO.puts "something else"
