@@ -22,14 +22,12 @@
 ###########################
 
 use Timex
-
 defmodule Bot do
+
   alias Nadia.Model.Update
   alias Nadia.Model.Message
   alias Nadia.Model.Chat
-
-  # defp @carousell_uri(search_count), do: "https://carousell.com/ui/iso/api;path=%2Fproducts%2Fsearch%2F;query=%7B%22count%22%3A" <> search_count <> "%2C%22start%22%3A0%2C%22sort%22%3A%22recent%22%2C%22query%22%3A%22gundam%22%7D"
-
+  alias Bot.Model.CarousellProduct
 
   def main(_args) do
     IO.puts "starting...."
@@ -63,9 +61,10 @@ defmodule Bot do
               %{result: %{products: products}} = Poison.decode!(body, keys: :atoms)
               bot_reply = Enum.reduce(Enum.with_index(products), "",
                 fn({p, index}, acc) ->
-                  %{title: title, price: price, id: id, time_created: time_created} = p
+                  struct_p =  struct(CarousellProduct, p)
+
                   time_ago =
-                    DateFormat.parse!(time_created, "{ISOz}")
+                    DateFormat.parse!(struct_p.time_created, "{ISOz}")
                     |> Date.diff(Date.now, :timestamp)
                     |> TimeFormat.format(:humanized)
                     |> Kernel.<>(" ago")
@@ -73,9 +72,9 @@ defmodule Bot do
                     |> String.replace(" minutes", "min")
 
                   IO.iodata_to_binary([acc, Integer.to_string(index+1), ":\n",
-                                        "[Title]: ", title, "\n",
-                                        "[Price]: ", price, "\n",
-                                        "[URL]: https://carousell.com/p/", Integer.to_string(id), "\n",
+                                        "[Title]: ", struct_p.title, "\n",
+                                        "[Price]: ", struct_p.price, "\n",
+                                        "[URL]: https://carousell.com/p/", Integer.to_string(struct_p.id), "\n",
                                         "[Time Created]: ", time_ago, "\n"])
                 end
               )
