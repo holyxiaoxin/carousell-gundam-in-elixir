@@ -49,6 +49,15 @@ defmodule Bot do
     loop(update_id)
   end
 
+  defp time_ago(time_created) when is_binary(time_created) do
+    DateFormat.parse!(time_created, "{ISOz}")
+    |> Date.diff(Date.now, :timestamp)
+    |> TimeFormat.format(:humanized)
+    |> Kernel.<>(" ago")
+    |> String.replace(" seconds", "sec")
+    |> String.replace(" minutes", "min")
+  end
+
   defp process_message(%{text: text, chat_id: chat_id}) do
     if Regex.match?(~r/\//, text) do # starts with "/"
       case text do
@@ -63,19 +72,11 @@ defmodule Bot do
                 fn({p, index}, acc) ->
                   struct_p =  struct(CarousellProduct, p)
 
-                  time_ago =
-                    DateFormat.parse!(struct_p.time_created, "{ISOz}")
-                    |> Date.diff(Date.now, :timestamp)
-                    |> TimeFormat.format(:humanized)
-                    |> Kernel.<>(" ago")
-                    |> String.replace(" seconds", "sec")
-                    |> String.replace(" minutes", "min")
-
                   IO.iodata_to_binary([acc, Integer.to_string(index+1), ":\n",
                                         "[Title]: ", struct_p.title, "\n",
                                         "[Price]: ", struct_p.price, "\n",
                                         "[URL]: https://carousell.com/p/", Integer.to_string(struct_p.id), "\n",
-                                        "[Time Created]: ", time_ago, "\n"])
+                                        "[Time Created]: ", time_ago(struct_p.time_created), "\n"])
                 end
               )
               Nadia.send_message(chat_id, bot_reply)
