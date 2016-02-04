@@ -9,6 +9,7 @@
   "mimerl": {:hex, :mimerl, "1.0.2"},
   "nadia": {:git, "https://github.com/zhyu/nadia", "7525c6b2445f3a65fc62a1f916c30d849026df67", []},
   "poison": {:hex, :poison, "1.5.2"},
+  "remix": {:hex, :remix, "0.0.2"},
   "ssl_verify_hostname": {:hex, :ssl_verify_hostname, "1.0.5"},
   "timex": {:git, "https://github.com/bitwalker/timex", "406868ff022dcfc8c7a84369ee582117f27ba837", []},
   "tzdata": {:hex, :tzdata, "0.1.8"},
