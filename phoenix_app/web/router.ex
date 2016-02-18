@@ -17,11 +17,14 @@ defmodule PhoenixApp.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
-    resources "/watchlists", WatchlistController, except: [:new, :edit]
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", PhoenixApp do
-  #   pipe_through :api
-  # end
+  scope "/api", PhoenixApp do
+    pipe_through :api
+
+    # resources "/watchlists", WatchlistController, except: [:new, :edit]
+
+    resources "/watchlists", WatchlistController
+  end
 end

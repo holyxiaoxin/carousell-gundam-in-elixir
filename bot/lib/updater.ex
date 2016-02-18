@@ -10,6 +10,9 @@ defmodule Bot.Updater do
     <>"%2C%22start%22%3A0%2C%22sort%22%3A%22recent%22%2C%22query%22%3A%22gundam%22%7D"
   end
 
+  defp phoenix_endpoint, do: "http://localhost:4000/api/"
+  defp phoenix_endpoint(pathname), do: "http://localhost:4000/api/#{pathname}"
+
   def loop(update_id) do
     Nadia.get_updates(timeout: 5, offset: update_id)
     |> case do
@@ -49,6 +52,18 @@ defmodule Bot.Updater do
               IO.puts "Not found :("
             {:error, %HTTPoison.Error{reason: reason}} ->
               IO.inspect ["error: ", reason]
+          end
+        "/watch" <> _ ->
+          body = "watchlist[chat_id]=#{chat_id}"
+          case HTTPoison.post(phoenix_endpoint('watchlists'), body, [{"Content-Type", "application/x-www-form-urlencoded"}]) do
+            {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+              IO.inspect body
+              # Nadia.send_message(chat_id, bot_reply)
+            {:ok, %HTTPoison.Response{status_code: 404}} ->
+              IO.puts "Not found :("
+            {:error, %HTTPoison.Error{reason: reason}} ->
+              IO.inspect ["error: ", reason]
+            {:ok, _} -> IO.puts "poison wrong"
           end
         _ ->
           IO.puts "something else"
