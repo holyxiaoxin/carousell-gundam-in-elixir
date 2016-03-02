@@ -3,11 +3,12 @@ defmodule PhoenixApp.Watchlist do
 
   schema "watchlists" do
     field :chat_id, :string
+    field :listing, :string
 
     timestamps
   end
 
-  @required_fields ~w(chat_id)
+  @required_fields ~w(chat_id listing)
   @optional_fields ~w()
 
   @doc """

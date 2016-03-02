@@ -53,19 +53,23 @@ defmodule Bot.Updater do
             {:error, %HTTPoison.Error{reason: reason}} ->
               IO.inspect ["error: ", reason]
           end
-        "/watch" <> _ ->
-          body = "watchlist[chat_id]=#{chat_id}"
+        "/watch " <> listing when listing != "" ->
+          body = "watchlist[chat_id]=#{chat_id}&watchlist[listing]=#{listing}"
           case HTTPoison.post(phoenix_endpoint('watchlists'), body, [{"Content-Type", "application/x-www-form-urlencoded"}]) do
-            {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+            {:ok, %HTTPoison.Response{status_code: 201, body: body}} ->
               IO.inspect body
-              # Nadia.send_message(chat_id, bot_reply)
+              bot_reply = "Watched!"
+              Nadia.send_message(chat_id, bot_reply)
             {:ok, %HTTPoison.Response{status_code: 404}} ->
               IO.puts "Not found :("
             {:error, %HTTPoison.Error{reason: reason}} ->
               IO.inspect ["error: ", reason]
-            {:ok, _} -> IO.puts "poison wrong"
+            {:ok, _} ->
+              IO.puts "Not valid response body"
           end
         _ ->
+          bot_reply = "Please enter a valid command."
+          Nadia.send_message(chat_id, bot_reply)
           IO.puts "something else"
       end
     else # normal text
