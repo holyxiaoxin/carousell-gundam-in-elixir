@@ -56,16 +56,23 @@ defmodule Bot.Updater do
         "/watch " <> listing when listing != "" ->
           body = "watchlist[chat_id]=#{chat_id}&watchlist[listing]=#{listing}"
           case HTTPoison.post(phoenix_endpoint('watchlists'), body, [{"Content-Type", "application/x-www-form-urlencoded"}]) do
-            {:ok, %HTTPoison.Response{status_code: 201, body: body}} ->
+            {:ok, %HTTPoison.Response{body: body}} ->
               IO.inspect body
               bot_reply = "Watched!"
               Nadia.send_message(chat_id, bot_reply)
-            {:ok, %HTTPoison.Response{status_code: 404}} ->
-              IO.puts "Not found :("
             {:error, %HTTPoison.Error{reason: reason}} ->
               IO.inspect ["error: ", reason]
-            {:ok, _} ->
-              IO.puts "Not valid response body"
+            _ ->
+              IO.puts "No matching response"
+          end
+        "/list" ->
+          case HTTPoison.get(phoenix_endpoint("watchlists/#{chat_id}")) do
+            {:ok, %HTTPoison.Response{body: body}} ->
+              Nadia.send_message(chat_id, body)
+            {:error, %HTTPoison.Error{reason: reason}} ->
+              IO.inspect ["error: ", reason]
+            _ ->
+              IO.puts "No matching response"
           end
         _ ->
           bot_reply = "Please enter a valid command."

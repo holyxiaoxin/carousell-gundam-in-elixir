@@ -26,10 +26,16 @@ defmodule PhoenixApp.WatchlistController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    watchlist = Repo.get!(Watchlist, id)
-    render(conn, "show.json", watchlist: watchlist)
+  def list(conn, %{"chat_id" => chat_id}) do
+    query = from p in Watchlist, where: p.chat_id == ^chat_id
+    watchlists = Repo.all(query)
+    render(conn, "index.json", watchlists: watchlists)
   end
+
+  # def show(conn, %{"id" => id}) do
+  #   watchlist = Repo.get!(Watchlist, id)
+  #   render(conn, "show.json", watchlist: watchlist)
+  # end
 
   def update(conn, %{"id" => id, "watchlist" => watchlist_params}) do
     watchlist = Repo.get!(Watchlist, id)

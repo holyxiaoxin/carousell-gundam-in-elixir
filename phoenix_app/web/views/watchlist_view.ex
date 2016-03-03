@@ -11,6 +11,7 @@ defmodule PhoenixApp.WatchlistView do
 
   def render("watchlist.json", %{watchlist: watchlist}) do
     %{id: watchlist.id,
-      chat_id: watchlist.chat_id}
+      chat_id: watchlist.chat_id,
+      listing: watchlist.listing}
   end
 end

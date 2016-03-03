@@ -23,8 +23,7 @@ defmodule PhoenixApp.Router do
   scope "/api", PhoenixApp do
     pipe_through :api
 
-    # resources "/watchlists", WatchlistController, except: [:new, :edit]
-
-    resources "/watchlists", WatchlistController
+    resources "/watchlists", WatchlistController, except: [:new, :edit, :show]
+    get "/watchlists/:chat_id", WatchlistController, :list
   end
 end
