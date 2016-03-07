@@ -10,7 +10,6 @@ defmodule Bot.Updater do
     <>"%2C%22start%22%3A0%2C%22sort%22%3A%22recent%22%2C%22query%22%3A%22gundam%22%7D"
   end
 
-  defp phoenix_endpoint, do: "http://localhost:4000/api/"
   defp phoenix_endpoint(pathname), do: "http://localhost:4000/api/#{pathname}"
 
   def loop(update_id) do
@@ -59,6 +58,21 @@ defmodule Bot.Updater do
             {:ok, %HTTPoison.Response{body: body}} ->
               IO.inspect body
               bot_reply = "Watched!"
+              Nadia.send_message(chat_id, bot_reply)
+            {:error, %HTTPoison.Error{reason: reason}} ->
+              IO.inspect ["error: ", reason]
+            _ ->
+              IO.puts "No matching response"
+          end
+        "/unwatch " <> id when id != "" ->
+          body = "watchlist[chat_id]=#{chat_id}"
+          case HTTPoison.delete(phoenix_endpoint("watchlists/#{id}/#{chat_id}")) do
+            {:ok, %HTTPoison.Response{body: body}} ->
+              bot_reply =
+              case Poison.decode(body, keys: :atoms) do
+                {:ok, %{status: "ok"}} -> "Unwatched!"
+                _ -> "Not valid!"
+              end
               Nadia.send_message(chat_id, bot_reply)
             {:error, %HTTPoison.Error{reason: reason}} ->
               IO.inspect ["error: ", reason]

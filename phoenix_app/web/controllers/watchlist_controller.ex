@@ -17,7 +17,6 @@ defmodule PhoenixApp.WatchlistController do
       {:ok, watchlist} ->
         conn
         |> put_status(:created)
-        |> put_resp_header("location", watchlist_path(conn, :show, watchlist))
         |> render("show.json", watchlist: watchlist)
       {:error, changeset} ->
         conn
@@ -32,10 +31,10 @@ defmodule PhoenixApp.WatchlistController do
     render(conn, "index.json", watchlists: watchlists)
   end
 
-  # def show(conn, %{"id" => id}) do
-  #   watchlist = Repo.get!(Watchlist, id)
-  #   render(conn, "show.json", watchlist: watchlist)
-  # end
+  def show(conn, %{"id" => id}) do
+    watchlist = Repo.get!(Watchlist, id)
+    render(conn, "show.json", watchlist: watchlist)
+  end
 
   def update(conn, %{"id" => id, "watchlist" => watchlist_params}) do
     watchlist = Repo.get!(Watchlist, id)
@@ -51,13 +50,12 @@ defmodule PhoenixApp.WatchlistController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    watchlist = Repo.get!(Watchlist, id)
+  def delete(conn, %{"id" => id, "chat_id" => chat_id}) do
+    watchlist = Repo.get(Watchlist, id)
 
-    # Here we use delete! (with a bang) because we expect
-    # it to always work (and if it does not, it will raise).
-    Repo.delete!(watchlist)
-
-    send_resp(conn, :no_content, "")
+    if watchlist && chat_id == watchlist.chat_id do
+      Repo.delete!(watchlist)
+    end
+    conn |> json(%{status: "ok"})
   end
 end
