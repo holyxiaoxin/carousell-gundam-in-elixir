@@ -23,7 +23,8 @@ defmodule Bot.Mixfile do
         :logger,
         :nadia,
         :httpoison, :poison,
-        :tzdata
+        :tzdata,
+        :quantum
       ]
     ]
   end
@@ -45,7 +46,8 @@ defmodule Bot.Mixfile do
      # https://github.com/bitwalker/timex/issues/86
      {:tzdata, "== 0.1.8", override: true},
      #
-     {:timex, git: "https://github.com/bitwalker/timex"}
+     {:timex, git: "https://github.com/bitwalker/timex"},
+     {:quantum, ">= 1.6.1"}
     ]
   end
 end
